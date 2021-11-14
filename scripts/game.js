@@ -1,11 +1,11 @@
 console.log('Olá, esta funcionando!');
-// Sprite 
+
 const sprites = new Image();
 sprites.src = '../sprites/sprites.png';
-// Selecionando o canvas
+
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
-// Plano de Fundo
+
 const background = {
   spriteX:390,
   spriteY:0,
@@ -34,7 +34,7 @@ const background = {
     );
   }
 }
-//Chão
+
 const ground = {
   spriteX:0,
   spriteY:610,
@@ -70,7 +70,7 @@ function collision(flappyBird, ground){
   }
   return false
 }
-// Passaro
+
 const flappyBird = {
   spriteX:0,
   spriteY:0,
@@ -102,7 +102,7 @@ const flappyBird = {
     );
   }
 }
-//Tela de inicio
+
 const homeScreen = {
   spriteX:134,
   spriteY:0,
@@ -121,7 +121,6 @@ const homeScreen = {
   }
 }
 
-//Telas 
 let activeScreen = {}
 function changeScreen(newScreen) {
   activeScreen = newScreen
