@@ -60,6 +60,16 @@ const ground = {
     );
   }
 }
+
+function collision(flappyBird, ground){
+  const flappyBirdY = flappyBird.y + flappyBird.height
+  const groundY = ground.y
+
+  if(flappyBirdY >= groundY){
+    return true
+  }
+  return false
+}
 // Passaro
 const flappyBird = {
   spriteX:0,
@@ -68,9 +78,17 @@ const flappyBird = {
   height:24,
   x:10,
   y:50,
+  jump: 4.6,
+  jumping() {
+    flappyBird.speed = - flappyBird.jump
+  },
   gravity: 0.25,
   speed: 0,
   refresh() {
+    if (collision(flappyBird, ground)) {
+      changeScreen(screens.START)
+      return
+    }
     flappyBird.speed = flappyBird.speed + flappyBird.gravity
     flappyBird.y = flappyBird.y + flappyBird.speed;
   },
@@ -130,6 +148,9 @@ screens.GAME = {
     background.draw()
     ground.draw()
     flappyBird.draw()
+  },
+  click(){
+    flappyBird.jumping()
   },
   refresh(){
     flappyBird.refresh()
