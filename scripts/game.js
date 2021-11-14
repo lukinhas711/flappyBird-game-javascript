@@ -1,7 +1,9 @@
 console.log('Olá, esta funcionando!');
 
 const sprites = new Image();
-sprites.src = '../sprites/sprites.png';
+sprites.src = './sprites/sprites.png';
+const soundHIT = new Audio()
+soundHIT.src = './effects/hit.wav'
 
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
@@ -71,37 +73,46 @@ function collision(flappyBird, ground){
   return false
 }
 
-const flappyBird = {
-  spriteX:0,
-  spriteY:0,
-  width:33,
-  height:24,
-  x:10,
-  y:50,
-  jump: 4.6,
-  jumping() {
-    flappyBird.speed = - flappyBird.jump
-  },
-  gravity: 0.25,
-  speed: 0,
-  refresh() {
-    if (collision(flappyBird, ground)) {
-      changeScreen(screens.START)
-      return
+function createBird(){
+    const flappyBird = {
+    spriteX:0,
+    spriteY:0,
+    width:33,
+    height:24,
+    x:10,
+    y:50,
+    jump: 4.6,
+    jumping() {
+      flappyBird.speed = - flappyBird.jump
+    },
+    gravity: 0.25,
+    speed: 0,
+    refresh() {
+      if (collision(flappyBird, ground)) {
+        soundHIT.play()
+        setTimeout(() => {
+          changeScreen(screens.START)
+        }, 500)
+        
+        return
+      }
+      flappyBird.speed = flappyBird.speed + flappyBird.gravity
+      flappyBird.y = flappyBird.y + flappyBird.speed;
+    },
+    draw(){
+      context.drawImage(
+        sprites,
+        flappyBird.spriteX, flappyBird.spriteY,
+        flappyBird.width, flappyBird.height,
+        flappyBird.x, flappyBird.y,
+        flappyBird.width, flappyBird.height,
+      )
     }
-    flappyBird.speed = flappyBird.speed + flappyBird.gravity
-    flappyBird.y = flappyBird.y + flappyBird.speed;
-  },
-  draw(){
-    context.drawImage(
-      sprites,
-      flappyBird.spriteX, flappyBird.spriteY,
-      flappyBird.width, flappyBird.height,
-      flappyBird.x, flappyBird.y,
-      flappyBird.width, flappyBird.height,
-    );
   }
+
+  return flappyBird
 }
+
 
 const homeScreen = {
   spriteX:134,
@@ -121,16 +132,23 @@ const homeScreen = {
   }
 }
 
+const global = {}
 let activeScreen = {}
 function changeScreen(newScreen) {
   activeScreen = newScreen
+  if(activeScreen.initialize){
+    activeScreen.initialize()
+  }
 }
 const screens = {
   START: {
+    initialize(){
+      global.flappyBird = createBird()
+     },
     draw(){
       background.draw()
       ground.draw()
-      flappyBird.draw()
+      global.flappyBird.draw()
       homeScreen.draw()
     },
     click(){
@@ -146,13 +164,13 @@ screens.GAME = {
   draw(){
     background.draw()
     ground.draw()
-    flappyBird.draw()
+    global.flappyBird.draw()
   },
   click(){
-    flappyBird.jumping()
+    global.flappyBird.jumping()
   },
   refresh(){
-    flappyBird.refresh()
+    global.flappyBird.refresh()
   }
 }
 
