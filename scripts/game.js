@@ -170,6 +170,98 @@ const homeScreen = {
   }
 };
 
+function createPipes(){
+  const pipes = {
+    width: 52,
+    height: 400,
+    ground: {
+      spriteX:0,
+      spriteY:169,
+    },
+    sky: {
+      spriteX:52,
+      spriteY:169,
+    },
+    space: 80,
+    draw() {
+      pipes.pairs.forEach(function(pair){
+        const randonY = pair.y;
+        const spacePipes = 90;
+
+        const pipeSkyX = pair.x;
+        const pipeSkyY = randonY;
+        context.drawImage(
+          sprites,
+          pipes.sky.spriteX, pipes.sky.spriteY,
+          pipes.width, pipes.height,
+          pipeSkyX, pipeSkyY,
+          pipes.width, pipes.height,
+        );
+
+        const pipeGroundX = pair.x;
+        const pipeGroundY = pipes.height + spacePipes + randonY;
+        context.drawImage(
+          sprites,
+          pipes.ground.spriteX, pipes.ground.spriteY,
+          pipes.width, pipes.height,
+          pipeGroundX, pipeGroundY,
+          pipes.width, pipes.height,
+        )
+
+        pair.pipeSky = {
+          x: pipeSkyX,
+          y: pipes.height + pipeSkyY
+        }
+        pair.pipeGround = {
+          x: pipeGroundX,
+          y: pipeGroundY
+        }
+      })
+    },
+    collision(pair){
+      const head = global.flappyBird.y;
+      const foot = global.flappyBird.y + global.flappyBird.height;
+
+      if(global.flappyBird.x >= pair.x){
+        if(head <= pair.pipeSky.y){
+          return true;
+        }
+        if(foot >= pair.pipeGround.y){
+          return true
+        }
+        return false
+      }
+    },
+    pairs:[],
+    refresh(){
+      const passed100frames = frames % 100 === 0;
+      if (passed100frames) {
+        pipes.pairs.push({
+          x: canvas.width,
+          y: -150 * (Math.random() + 1),
+        })
+      }
+      pipes.pairs.forEach(function(pair){
+        pair.x = pair.x - 2
+
+        if(pipes.collision(pair)){
+          soundHIT.play();
+          setTimeout(() => {
+            changeScreen(screens.START);
+          }, 500);
+
+        return;
+        }
+
+        if(pair.x + pipes.width <= 0){
+          pipes.pairs.shift()
+        }
+      })
+    }
+  }
+  return pipes;
+}
+
 const global = {};
 let activeScreen = {};
 function changeScreen(newScreen) {
@@ -181,20 +273,21 @@ function changeScreen(newScreen) {
 const screens = {
   START: {
     initialize() {
-      global.flappyBird = createBird()
-      global.ground = createGround()
+      global.flappyBird = createBird();
+      global.ground = createGround();
+      global.pipes = createPipes();
     },
     draw() {
-      background.draw()
-      global.ground.draw()
-      global.flappyBird.draw()
-      homeScreen.draw()
+      background.draw();
+      global.flappyBird.draw();
+      global.ground.draw();
+      homeScreen.draw();
     },
     click() {
-      changeScreen(screens.GAME)
+      changeScreen(screens.GAME);
     },
     refresh() {
-      global.ground.refresh()
+      global.ground.refresh();
     }
   }
 }
@@ -202,6 +295,7 @@ const screens = {
 screens.GAME = {
   draw() {
     background.draw()
+    global.pipes.draw()
     global.ground.draw()
     global.flappyBird.draw()
   },
@@ -210,6 +304,7 @@ screens.GAME = {
   },
   refresh() {
     global.flappyBird.refresh()
+    global.pipes.refresh()
     global.ground.refresh()
   }
 }
