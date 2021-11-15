@@ -1,13 +1,16 @@
 console.log('Olá, esta funcionando!');
 
+
+let frames = 0;
 const sprites = new Image();
 sprites.src = './sprites/sprites.png';
+
 const soundHIT = new Audio();
 soundHIT.src = './effects/hit.wav';
 
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
-let frames = 0;
+
 
 const background = {
   spriteX: 390,
@@ -113,22 +116,22 @@ function createBird() {
     },
     //arrumar bug = o refreshFrame faz os calculos, mas não alterna entre as posições do array
     mov: [
-      {spriteX:0, spriteY:0,},
-      {spirteX:0, spirteY:26,},
-      {spirteX:0, spirteY:52,},
-      {spirteX:0, spirteY:26,},
+      {spriteX: 0, spriteY: 0,},
+      {spriteX: 0, spriteY: 26,},
+      {spriteX: 0, spriteY: 52,},
+      {spriteX: 0, spriteY: 26,},
     ],
     atualFrame: 0,
     refreshFrame(){
       const frameInterval = 10;
-      const breakInterval = frames % frameInterval === 0
+      const breakInterval = frames % frameInterval === 0;
       if(breakInterval) {
         const incrementBase = 1;
         const increment = incrementBase + flappyBird.atualFrame;
         const repeatBase = flappyBird.mov.length;
-        console.log('incremento', increment)
-        console.log('base da repetição', repeatBase)
-        console.log('frame', flappyBird.atualFrame)
+        // console.log('incremento', increment)
+        // console.log('base da repetição', repeatBase)
+        // console.log('frame', increment % repeatBase)
         flappyBird.atualFrame = increment % repeatBase;
       }
     },
@@ -215,9 +218,9 @@ screens.GAME = {
 function loop() {
   activeScreen.draw();
   activeScreen.refresh();
-  requestAnimationFrame(loop);
   frames = frames + 1;
-  console.log('frameatual', frames)
+  requestAnimationFrame(loop);
+  // console.log('frameatual', frames)
 }
 
 window.addEventListener('click', function () {
